@@ -1,2 +1,7 @@
 Install packages:
 
+1. Word embedding: spacy-model https://github.com/explosion/spacy-models/releases//tag/en_core_web_lg-2.2.5
+  - Installation
+  pip install spacy
+  python -m spacy download en_core_web_lg
+  
