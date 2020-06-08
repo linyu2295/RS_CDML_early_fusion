@@ -7,5 +7,8 @@ Install packages:
     pip install spacy
     python -m spacy download en_core_web_lg
   
-2. 
+2. Embedding Neural Network for content features:
+  - tensorflow
+  - keras
+  
 
