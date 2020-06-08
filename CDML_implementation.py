@@ -73,7 +73,6 @@ df_articles = df_articles.sort_values(by = 'articleId').reset_index(drop = True)
 #    columns: 
 #           userId
 #           articleId
-#           click/read (binary?)
 click_filename =''
 df_clicks = pd.read_csv(click_filename)
 print(df_clicks.shape)
