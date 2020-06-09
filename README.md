@@ -3,7 +3,7 @@
 1. Collaborative Deep Metric Learning with early fusion
 2. Collaborative Deep Metric Learning with late fusion
 
-Install packages:
+# Install packages:
 
 1. Spacy-model for word embedding
   - Convert article content into word vectors
@@ -16,4 +16,11 @@ Install packages:
   - tensorflow
   - keras
   
+# Run python script with three filenames arguments
 
+Test case:
+  - two input filenames: test_articles.csv and test_clicks.csv
+  - one output filename: test_comparison_results.csv
+
+  python CDML_implementation_new.py test_articles.csv test_clicks.csv test_comparison_results.csv
+  
