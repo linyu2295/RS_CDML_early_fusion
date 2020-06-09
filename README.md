@@ -19,7 +19,7 @@
 # Run python script with three filename arguments
 
 Test case:
-  - two input filenames: test_articles.csv and test_clicks.csv
+  - two input filenames: test_articles.csv (articleId, title, category) and test_clicks.csv (userId, articleId)
   - one output filename: test_comparison_results.csv
 
 ```
