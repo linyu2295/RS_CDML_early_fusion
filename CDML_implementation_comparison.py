@@ -693,11 +693,29 @@ def item_recommendations(articleId, item_corr, cowatched_mat_s, method, k):
     #print(method)
 
     idx = indices[articleId]
-    sim_scores = list(enumerate(item_corr[idx]))
-    sim_scores.pop(idx)
+    target_category = articleIds[articleIds.articleId == articleId]['category'].values
 
-    sim_scores = sorted(sim_scores, key = lambda x: x[1], reverse = True)
-    sim_scores = sim_scores[:k] # 
+    sim_scores_all = list(enumerate(item_corr[idx]))
+    sim_scores_all.pop(idx)
+
+    sim_scores_all = sorted(sim_scores_all, key = lambda x: x[1], reverse = True)
+
+    # sim_scores = sim_scores[:k] # 
+    article_indices = [i[0] for i in sim_scores_all]
+    tmp_recommend = articleIds.iloc[article_indices].reset_index(drop = True)
+
+    sim_scores = []
+    kk = 1
+    for i in range(tmp_recommend.shape[0]):
+        if tmp_recommend['category'][i] != target_category and kk <= k:
+            sim_scores.append(sim_scores_all[i])
+            kk += 1
+        elif tmp_recommend['category'][i] == target_category and kk <= k:
+            continue
+        elif kk > k:
+            break
+
+    del article_indices, tmp_recommend
 
     rel_scores = [cowatched_mat_s[idx, j] for j in [i[0] for i in sim_scores]]
     #print('# of cowatched users (rel_scores): '.format(rel_scores))
@@ -723,11 +741,8 @@ def item_recommendations(articleId, item_corr, cowatched_mat_s, method, k):
     article_indices = [i[0] for i in sim_scores]
     tmp_recommend = articleIds.iloc[article_indices].reset_index(drop = True)
 
-    target_category = articleIds[articleIds.articleId == articleId]['category'].values
-    category_coverage = np.mean([int(c == target_category) for c in list(tmp_recommend['category'])])
-
     return pd.concat([tmp_recommend, pd.DataFrame(rel_scores, columns=['rel_score'])], axis = 1), \
-            NDCG_k, NDCG_k_b, NDCG_k_b10, MAP_b, MAP_b10, category_coverage
+            NDCG_k, NDCG_k_b, NDCG_k_b10, MAP_b, MAP_b10
 
 
 # evaluation with articleId_lists
@@ -735,7 +750,7 @@ def get_eval_results(articleId_lists, item_corr, cowatched_mat_s, method, k):
     print(method)
     
     df_metrics = pd.DataFrame(index = articleId_lists, columns = ['NDCG_orginal', 'NDCG_binary', 'NDCG_threshold10',
-                                                                   'MAP_binary', 'MAP_threshold10', 'category_coverage'])
+                                                                   'MAP_binary', 'MAP_threshold10'])
 
     df_popular_cnts = np.zeros((len(articleId_lists), k))
     df_rel_scores = np.zeros((len(articleId_lists), k))
@@ -753,11 +768,11 @@ def get_eval_results(articleId_lists, item_corr, cowatched_mat_s, method, k):
         # MAP
         df_metrics.MAP_binary[target_id] = tmp_results[4]
         df_metrics.MAP_threshold10[target_id] = tmp_results[5]
-        
-        # category coverage: diversity, smaller -> better
-        df_metrics.category_coverage[target_id] = tmp_results[6]
-    
+            
     return df_metrics, df_popular_cnts, df_rel_scores
+
+
+
 
 
 
@@ -774,8 +789,10 @@ indices = pd.Series(df_articles_cnts.index, index = df_articles_cnts['articleId'
 #------------------------------------------------------------------------------------------
 # evaluation articleIds
 
-eval_num = 100
+eval_num = 200
 articleId_lists =  list(df_articles.sample(eval_num, random_state=123, replace = False)['articleId']) 
+
+print('Evaluation with {} articles...'.format(eval_num))
 
 #------------------------------------------------------------------------------------------
 # 1. early fusion
@@ -855,19 +872,38 @@ metric = 'cosine'
 n_jobs = -1
 
 KNN_df_metrics = pd.DataFrame(index = articleId_lists, columns = ['NDCG_orginal', 'NDCG_binary', 'NDCG_threshold10',
-                                                               'MAP_binary', 'MAP_threshold10', 'category_coverage'])
+                                                               'MAP_binary', 'MAP_threshold10'])
 KNN_df_popular_cnts = np.zeros((len(articleId_lists), k))
 KNN_df_rel_scores = np.zeros((len(articleId_lists), k))
 
 
 for i, target_id in enumerate(articleId_lists):
     target_m = df_articles[df_articles.articleId == target_id]['title'].apply(lambda x: ' '.join(x)).to_string()
+    target_category = articleIds[articleIds.articleId == target_id]['category'].values
     # print(target_m)
 
     idx = indices[target_id]
 
-    raw_recommends = make_inferece(item_user_mat_sparse, hashmap, target_m, k, n_neighbors, 
+    raw_recommends_all = make_inferece(item_user_mat_sparse, hashmap, target_m, 10*k, n_neighbors, 
                                   algorithm, metric, n_jobs)
+
+    article_indices = [i[0] for i in raw_recommends_all]
+    tmp_recommend = articleIds.iloc[article_indices].reset_index(drop=True) 
+
+
+    raw_recommends = []
+    kk = 1
+    for i in range(tmp_recommend.shape[0]):
+        if tmp_recommend['category'][i] != target_category and kk <= k:
+            raw_recommends.append(raw_recommends_all[i])
+            kk += 1
+        elif tmp_recommend['category'][i] == target_category and kk <= k:
+            continue
+        elif kk > k:
+            break
+
+    article_indices = [i[0] for i in raw_recommends]
+    tmp_recommend = articleIds.iloc[article_indices].reset_index(drop=True) 
 
     rel_scores = [cowatched_mat_s[idx, j] for j, dist in raw_recommends]
 
@@ -885,12 +921,6 @@ for i, target_id in enumerate(articleId_lists):
     KNN_df_metrics.MAP_binary[target_id] = cal_MAP(cowatched_mat_s, idx, rel_scores, threshold = 1)
     KNN_df_metrics.MAP_threshold10[target_id] = cal_MAP(cowatched_mat_s, idx, rel_scores, threshold = 10)
 
-    # Category Coverage
-    article_indices = [i[0] for i in raw_recommends]
-    tmp_recommend = articleIds.iloc[article_indices].reset_index(drop=True) 
-    
-    target_category = articleIds[articleIds.articleId == target_id]['category'].values
-    KNN_df_metrics.category_coverage[target_id] = np.mean([int(c == target_category) for c in list(tmp_recommend['category'])])
     
 
 #------------------------------------------------------------------------------------------
@@ -902,7 +932,8 @@ comparison_results = pd.DataFrame([SVD_df_metrics.mean(axis = 0, skipna = True),
                                 content_df_metrics.mean(axis = 0, skipna = True),
                                 CDML_early_df_metrics.mean(axis = 0, skipna = True)], 
                                 index=['SVD_mean', 'NMF_mean', 'KNN_mean', 'TFIDF_mean', 'Content_mean', 'CDML_mean']) 
-print('Comparison results ...')
+
+print('Comparison results for top-{} recommendaitons ...'.format(k))
 print(comparison_results)
 
 
