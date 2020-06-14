@@ -23,5 +23,5 @@ Test case:
   - one output filename: test_comparison_results.csv
 
 ```
-  python CDML_implementation_new.py test_articles.csv test_clicks.csv test_comparison_results.csv
+  python CDML_implementation_comparison.py test_articles.csv test_clicks.csv test_comparison_results.csv
 ``` 
