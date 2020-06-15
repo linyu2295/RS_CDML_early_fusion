@@ -38,11 +38,11 @@ from sklearn.preprocessing import normalize
 import re
 
 import spacy
-# import en_core_web_lg  # large 
-# nlp = en_core_web_lg.load()
+import en_core_web_lg  # large 
+nlp = en_core_web_lg.load()
 
-import en_core_web_sm
-nlp = en_core_web_sm.load()
+# import en_core_web_sm
+# nlp = en_core_web_sm.load()
 # en_core_web_sm
 ### Convert raw content into word vectors
 
