@@ -25,3 +25,7 @@ Test case:
 ```
   python CDML_implementation_comparison.py test_articles.csv test_clicks.csv test_comparison_results.csv
 ``` 
+
+3. Input Data (cleaned data, no NaNs and deduplicated):
+  - Article contents: articleId (string), title (string), category (string)
+  - User behavior: UserId (string), articleId (string)
