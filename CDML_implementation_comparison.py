@@ -83,6 +83,14 @@ k = 4
 df_articles = pd.read_csv(article_filename, names= ['articleId', 'title', 'category'])
 print('Article content file (articleId, title, category): shape = {}'.format(df_articles.shape))
 
+## Data preprocessing: 
+# (1) drop NaNs
+df_articles = df_articles.dropna()
+# (2) deduplication
+df_articles = df_articles[df_articles['articleId'] != '0']
+df_articles.drop_duplicates('articleId', inplace = True)
+
+
 ## Raw title/body context:
 # Break up the big title/body context string into a string array of words
 df_articles['title'] = df_articles['title'].apply(lambda x: re.findall(r'\w+', x))
@@ -100,7 +108,14 @@ df_articles = df_articles.sort_values(by = 'articleId').reset_index(drop = True)
 df_clicks = pd.read_csv(click_filename, names = ['userId', 'articleId'])
 print('User behavior file (userId, articleId): shape = {}'.format(df_clicks.shape))
 
+## Data preprocessing: 
+# (1) drop NaNs
+df_clicks = df_clicks.dropna()
+# (2) deduplication
+df_clicks = df_clicks[df_clicks['articleId'] != '0']
+df_clicks.drop_duplicates(inplace = True)
 
+##############################################
 # Combine article content and clicks dataset
 df_combine = pd.merge(df_clicks, df_articles, how = 'left', on = 'articleId')
 # print(df_combine.shape)
