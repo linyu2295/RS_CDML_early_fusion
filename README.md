@@ -16,16 +16,21 @@
   - tensorflow
   - keras
   
+3. Input Data (cleaned data, no NaNs and deduplicated):
+  - Article contents: articleId (string), title (string), category (string)
+  - User behavior: UserId (string), articleId (string)
+
+
 # Run python script with three filename arguments
 
 Test case:
   - two input filenames: test_articles.csv (articleId, title, category) and test_clicks.csv (userId, articleId)
-  - one output filename: test_comparison_results.csv
+
+Steps:
+(1) First run ```0_Data_preprocessing.py``` to preprocess the input dataset
+(2) The
 
 ```
   python CDML_implementation_comparison.py test_articles.csv test_clicks.csv test_comparison_results.csv
 ``` 
 
-3. Input Data (cleaned data, no NaNs and deduplicated):
-  - Article contents: articleId (string), title (string), category (string)
-  - User behavior: UserId (string), articleId (string)
