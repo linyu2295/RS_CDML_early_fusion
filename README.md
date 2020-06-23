@@ -21,7 +21,7 @@
   - User behavior: UserId (string), articleId (string)
 
 
-# Run python script with three filename arguments
+# Run python script
 
 Test case:
   - two input filenames: test_articles.csv (articleId, title, category) and test_clicks.csv (userId, articleId)
