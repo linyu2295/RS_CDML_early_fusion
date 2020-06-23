@@ -27,10 +27,13 @@ Test case:
   - two input filenames: test_articles.csv (articleId, title, category) and test_clicks.csv (userId, articleId)
 
 Steps:
-(1) First run ```0_Data_preprocessing.py``` to preprocess the input dataset
-(2) The
 
+  - First run 0_Data_preprocessing.py to preprocess the input dataset
 ```
-  python CDML_implementation_comparison.py test_articles.csv test_clicks.csv test_comparison_results.csv
+  python 0_Data_preprocessing.py test_articles.csv test_clicks.csv
+```
+  - Then run other five files separately
+```
+  python 1_implementation_CDML_and_Content_only.py test_articles.csv test_clicks.csv
 ``` 
 
