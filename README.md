@@ -35,5 +35,18 @@ Steps:
   - Then run other five files separately
 ```
   python 1_implementation_CDML_and_Content_only.py test_articles.csv test_clicks.csv
+  python 2_implementation_TFIDF.py test_articles.csv test_clicks.csv
+  python 3_implementation_NMF.py test_articles.csv test_clicks.csv
+  python 4_implementation_SVD.py test_articles.csv test_clicks.csv
+  python 5_implementation_KNN.py test_articles.csv test_clicks.csv
 ``` 
+
+  - The comparison results will be saved in 5 different csv files:
+```
+  1_comparison_results_CDML_and_content_only.csv
+  2_comparison_results_TFIDF.csv
+  3_comparison_results_NMF.csv
+  4_comparison_results_SVD.csv
+  5_comparison_results_KNN.csv
+```
 
