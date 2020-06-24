@@ -79,6 +79,18 @@ df_clicks = df_clicks[df_clicks['articleId'] != '0']
 df_clicks.drop_duplicates(inplace = True)
 
 
+## Downsampling
+sub_n = 2000
+
+sub_articleIds = np.random.choice(df_clicks['articleId'].value_counts().index.values[:10000], \
+                                sub_n, replace = False)
+
+df_articles = df_articles[df_articles.articleId.isin(sub_articleIds)].reset_index(drop=True)
+df_clicks = df_clicks[df_clicks.articleId.isin(sub_articleIds)].reset_index(drop=True)
+
+df_articles.to_csv('sub_articles.csv', header = False)
+df_clicks.to_csv('sub_clicks.csv', header = False)
+
 
 ##############################################
 # Combine article content and clicks dataset
@@ -123,7 +135,12 @@ cowatched_mat = np.zeros((n_articles, n_articles))
 
 for r in range(n_articles):
     for c in range(r+1, n_articles):
-        cowatched_mat[r, c] = len(d_user[df_articles['articleId'][r]].intersection(d_user[df_articles['articleId'][c]]))
+        if d_user.get(df_articles['articleId'][r]) == None or d_user.get(df_articles['articleId'][c]) == None:
+            cowatched_mat[r, c] = 0
+        else:
+            cowatched_mat[r, c] = len(d_user[df_articles['articleId'][r]].intersection(d_user[df_articles['articleId'][c]]))
+    if r%10 == 0:
+        print(r, round(time.time() - start_time), 2)
 
 # Co-watched matrix: symmetric
 cowatched_mat_s = cowatched_mat + cowatched_mat.T
