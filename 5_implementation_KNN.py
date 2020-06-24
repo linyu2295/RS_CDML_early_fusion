@@ -88,7 +88,7 @@ print('User behavior file (userId, articleId): shape = {}'.format(df_clicks.shap
 df_clicks = df_clicks.dropna()
 # (2) deduplication
 df_clicks = df_clicks[df_clicks['articleId'] != '0']
-df_clicks.drop_duplicates(inplace = True)
+df_clicks = df_clicks.drop_duplicates().reset_index(drop=True)
 
 ##############################################
 # Combine article content and clicks dataset
